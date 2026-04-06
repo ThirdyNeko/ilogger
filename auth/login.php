@@ -7,14 +7,16 @@ $pdo = qa_db();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
-    $password  = trim($_POST['password'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
     if ($username === '' || $password === '') {
         $error = "Please enter both username and password.";
     } else {
-
+        // Query DB exactly as typed
         $stmt = $pdo->prepare("
-            EXEC get_user_by_username @username = :username
+            SELECT TOP 1 *
+            FROM [BRANCH_LOGGER].[dbo].[users]
+            WHERE username = :username
         ");
 
         $stmt->execute([
@@ -23,23 +25,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // 🔐 Always check user first
-        if ($user && password_verify($password, $user['password'])) {
-
-            // 🔥 Regenerate session ID (VERY IMPORTANT)
+        // Verify password
+        if ($user && password_verify($password, $user['password_hash'])) {
             session_regenerate_id(true);
 
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
-            $_SESSION['branch'] = $user['branch'] ?? null;
-            $_SESSION['brand']  = $user['brand'] ?? null;
+            $_SESSION['first_login'] = $user['first_login'];
 
             header("Location: ../index.php");
             exit;
-
         } else {
-            $error = "Invalid ID or password.";
+            $error = "Invalid username or password.";
         }
     }
 }
@@ -50,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Promodizer Manager</title>
+<title>Login - Branch Logger</title>
 
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
@@ -106,42 +104,21 @@ body {
 <body>
 
 <div class="login-card">
-    <h3 class="text-center mb-4">Promodizer Manager</h3>
+    <h3 class="text-center mb-4">Branch Logger Login</h3>
 
     <?php if ($error): ?>
-        <div class="alert alert-danger text-center small"><?= $error ?></div>
+        <div class="alert alert-danger text-center small"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
     <form method="POST">
         <div class="mb-4">
-            <label class="form-label">Username</label>
             <input type="text"
                 name="username"
                 id="username"
-                class="form-control form-control-lg text-center uppercase-input"
+                class="form-control form-control-lg text-center"
                 placeholder="Enter Username"
                 required>
         </div>
-
-        <style>
-        /* Only transform the typed text, not the placeholder */
-        .uppercase-input {
-            text-transform: none; /* base input text will be controlled by JS */
-        }
-
-        .uppercase-input::-ms-input-placeholder { /* IE 10+ */
-            text-transform: none;
-        }
-        .uppercase-input::placeholder {
-            text-transform: none;
-        }
-        </style>
-
-        <script>
-        document.getElementById('username').addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-        </script>
 
         <div class="input-group mb-4">
             <input type="password"
