@@ -52,7 +52,9 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             ? "<span class='text-danger fw-bold'>{$total_errors}</span>" 
             : "0",
 
-        $row['last_updated']
+        $row['last_updated'] 
+            ? date('Y-m-d H:i:s', strtotime($row['last_updated'])) 
+            : '-'
     ];
 }
 
