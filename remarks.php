@@ -44,11 +44,6 @@ $pdo = qa_db();
                 <div class="row g-2">
 
                     <div class="col-md-2">
-                        <label class="form-label">User ID</label>
-                        <input type="text" id="filterUserId" class="form-control">
-                    </div>
-
-                    <div class="col-md-2">
                         <label class="form-label">Username</label>
                         <input type="text" id="filterUsername" class="form-control">
                     </div>
@@ -93,17 +88,13 @@ $pdo = qa_db();
                     <table id="remarksTable" class="table table-striped table-hover align-middle text-center">
                         <thead class="table-dark">
                             <tr>
-                                <th>User ID</th>
-                                <th>Username</th>
+                                <th>Program</th>
                                 <th>Session</th>
                                 <th>Iteration</th>
                                 <th>Remark Name</th>
-                                <th>Remark</th>
-                                <th>Created At</th>
                                 <th>Resolved</th>
-                                <th>Resolved At</th>
-                                <th>Resolved By</th>
-                                <th>Resolve Comment</th>
+                                <th>Username</th>
+                                <th>Created At</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -126,16 +117,15 @@ $(document).ready(function () {
         processing: true,
         serverSide: false,
         ajax: {
-            url: 'functions/remarks_server.php', // you will create this
+            url: 'functions/remarks_server.php',
             type: 'POST',
             data: function(d) {
-                d.user_id = $('#filterUserId').val();
-                d.username = $('#filterUsername').val();
-                d.program = $('#filterProgram').val();
+                d.username    = $('#filterUsername').val();
+                d.program     = $('#filterProgram').val();
                 d.remark_name = $('#filterRemarkName').val();
-                d.resolved = $('#filterResolved').val();
-                d.from_date = $('#filterFrom').val();
-                d.to_date = $('#filterTo').val();
+                d.resolved    = $('#filterResolved').val();
+                d.from_date   = $('#filterFrom').val();
+                d.to_date     = $('#filterTo').val();
             }
         },
         pageLength: 25,
@@ -143,24 +133,24 @@ $(document).ready(function () {
         ordering: false
     });
 
-    // Refresh
+    // Refresh button
     $('#refreshRemarks').on('click', function() {
         table.ajax.reload();
     });
 
     // Reload on filter change
-    $('#filterUserId, #filterUsername, #filterProgram, #filterRemarkName, #filterResolved, #filterFrom, #filterTo')
+    $('#filterUsername, #filterProgram, #filterRemarkName, #filterResolved, #filterFrom, #filterTo')
         .on('change keyup', function() {
             table.ajax.reload();
         });
 
-    // Optional: row click
+    // Row click to iteration view
     $('#remarksTable tbody').on('click', 'tr', function() {
         const data = table.row(this).data();
         if (!data) return;
 
-        const session = data[2]; // session column
-        const iteration = data[3]; // iteration column
+        const session   = data[1];   // Session
+        const iteration = data[2];   // Iteration
 
         window.location.href = `iteration_viewer.php?session=${encodeURIComponent(session)}&iteration=${encodeURIComponent(iteration)}`;
     });

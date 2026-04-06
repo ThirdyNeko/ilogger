@@ -4,9 +4,8 @@ include '../config/db.php';
 $pdo = qa_db();
 
 // Get filters from POST
-$user_id     = $_POST['user_id'] ?? null;
 $username    = $_POST['username'] ?? null;
-$program     = $_POST['program'] ?? null;
+$program     = $_POST['program'] ?? null;       // use 'program' to match filter input
 $remark_name = $_POST['remark_name'] ?? null;
 $resolved    = $_POST['resolved'] ?? null;
 $from_date   = $_POST['from_date'] ?? null;
@@ -27,7 +26,6 @@ if ($resolved !== null && $resolved !== '') {
 // Call stored procedure
 $stmt = $pdo->prepare("
     EXEC get_remarks
-        @user_id     = :user_id,
         @username    = :username,
         @program     = :program,
         @remark_name = :remark_name,
@@ -37,7 +35,6 @@ $stmt = $pdo->prepare("
 ");
 
 $stmt->execute([
-    ':user_id'     => $user_id ?: null,
     ':username'    => $username ?: null,
     ':program'     => $program ?: null,
     ':remark_name' => $remark_name ?: null,
@@ -51,19 +48,13 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $isUnresolved = !$row['resolved']; // highlight if unresolved
 
     $data[] = [
-        htmlspecialchars($row['user_id']),
-        htmlspecialchars($row['username']),
+        htmlspecialchars($row['program_name']),
         htmlspecialchars($row['session_id']),
         htmlspecialchars($row['iteration']),
         htmlspecialchars($row['remark_name']),
-        "<span class='" . ($isUnresolved ? "text-danger fw-bold" : "") . "'>" . 
-            htmlspecialchars($row['remark']) . 
-        "</span>",
-        $row['created_at'],
         $row['resolved'] ? 'Yes' : 'No',
-        $row['resolved_at'] ?? '-',
-        htmlspecialchars($row['resolved_by'] ?? '-'),
-        htmlspecialchars($row['resolve_comment'] ?? '-')
+        htmlspecialchars($row['username']),
+        $row['created_at']  // already formatted yyyy-mm-dd hh:mi:ss in SP
     ];
 }
 
