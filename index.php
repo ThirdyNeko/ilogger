@@ -43,36 +43,65 @@ $pdo = qa_db();
         <!-- TABLE -->
         <div class="card shadow-sm">
             <div class="card-body">
-                <div class="row g-2">
+                <style>
+                /* Make the first four filters narrower */
+                .filter-small {
+                    max-width: 250px; /* adjust as needed */
+                }
+                /* Make date/time wider */
+                .filter-date-time {
+                    max-width: 150px; /* adjust as needed */
+                }
+                </style>
 
-                    <div class="col-md-2">
+                <div class="row g-2 align-items-end">
+
+                    <!-- Program -->
+                    <div class="col filter-small">
                         <label class="form-label">Program</label>
                         <input type="text" id="filterProgram" class="form-control">
                     </div>
 
-                    <div class="col-md-2">
+                    <!-- Branch -->
+                    <div class="col filter-small">
                         <label class="form-label">Branch</label>
                         <input type="text" id="filterBranch" class="form-control">
                     </div>
 
-                    <div class="col-md-2">
+                    <!-- User ID -->
+                    <div class="col filter-small">
                         <label class="form-label">User ID</label>
                         <input type="text" id="filterUserId" class="form-control">
                     </div>
 
-                    <div class="col-md-2">
+                    <!-- Client IP -->
+                    <div class="col filter-small">
                         <label class="form-label">Client IP</label>
                         <input type="text" id="filterClientIP" class="form-control">
                     </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label">From</label>
+                    <!-- From Date -->
+                    <div class="col filter-date-time">
+                        <label class="form-label">From Date</label>
                         <input type="date" id="filterFrom" class="form-control">
                     </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label">To</label>
+                    <!-- From Time -->
+                    <div class="col filter-date-time">
+                        <label class="form-label">From Time</label>
+                        <input type="time" id="filterFromTime" class="form-control">
+                    </div>
+
+                    <!-- To Date -->
+                    <div class="col filter-date-time">
+                        <label class="form-label">To Date</label>
                         <input type="date" id="filterTo" class="form-control">
+                    </div>
+
+                    <!-- To Time -->
+                    <div class="col filter-date-time">
+                        <label class="form-label">To Time</label>
+                        <input type="time" id="filterToTime" class="form-control">
                     </div>
 
                 </div>
@@ -123,6 +152,8 @@ $(document).ready(function () {
                 d.client_ip = $('#filterClientIP').val();
                 d.from_date = $('#filterFrom').val();
                 d.to_date   = $('#filterTo').val();
+                d.from_time = $('#filterFromTime').val();
+                d.to_time   = $('#filterToTime').val();
             }
         },
         pageLength: 25,
@@ -135,8 +166,8 @@ $(document).ready(function () {
         table.ajax.reload();
     });
 
-    // 🔍 Auto reload on filter change
-    $('#filterProgram, #filterBranch, #filterUserId, #filterClientIP, #filterFrom, #filterTo')
+    // 🔍 Auto reload on filter change (now includes time filters)
+    $('#filterProgram, #filterBranch, #filterUserId, #filterClientIP, #filterFrom, #filterTo, #filterFromTime, #filterToTime')
         .on('change keyup', function () {
             table.ajax.reload();
         });
