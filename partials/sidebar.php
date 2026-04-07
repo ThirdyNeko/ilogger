@@ -1,6 +1,8 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
-$current_page = basename($_SERVER['PHP_SELF']);
+require_once __DIR__ . '/../auth/require_login.php'; // Make sure BASE_URL is defined
+
+$current_page = basename($_SERVER['SCRIPT_NAME']); // safer across folders
 ?>
 
 <div class="sidebar d-flex flex-column p-3 bg-dark">
@@ -13,8 +15,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
         <!-- Logs -->
         <li class="nav-item">
-            <a href="index.php"
-               class="nav-link d-flex align-items-center gap-2 text-light <?= $current_page == 'index.php' ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php"
+               class="nav-link d-flex align-items-center gap-2 text-light <?= in_array($current_page, ['index.php','qa_viewer.php','admin_viewer.php','dev_viewer.php']) ? 'active' : '' ?>">
                 <i class="bi bi-list-check"></i>
                 <span class="sidebar-text">Logs</span>
             </a>
@@ -22,7 +24,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
         <!-- Remarks -->
         <li>
-            <a href="remarks.php"
+            <a href="<?= BASE_URL ?>remarks.php"
                class="nav-link d-flex align-items-center gap-2 text-light <?= $current_page == 'remarks.php' ? 'active' : '' ?>">
                 <i class="bi bi-chat-left-text"></i>
                 <span class="sidebar-text">Remarks</span>
@@ -31,7 +33,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
         <!-- Change Password -->
         <li>
-            <a href="change_password.php"
+            <a href="<?= BASE_URL ?>change_password.php"
                class="nav-link d-flex align-items-center gap-2 text-light <?= $current_page == 'change_password.php' ? 'active' : '' ?>">
                 <i class="bi bi-key"></i>
                 <span class="sidebar-text">Change Password</span>
@@ -61,7 +63,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </div>
 
         <!-- Logout -->
-        <a href="auth/logout.php"
+        <a href="<?= BASE_URL ?>auth/logout.php"
            class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
             <i class="bi bi-box-arrow-right"></i>
             <span class="sidebar-text">Logout</span>
