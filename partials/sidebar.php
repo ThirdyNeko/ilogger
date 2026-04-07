@@ -33,8 +33,10 @@ $current_page = basename($_SERVER['SCRIPT_NAME']); // safer across folders
 
         <!-- Change Password -->
         <li>
-            <a href="<?= BASE_URL ?>change_password.php"
-               class="nav-link d-flex align-items-center gap-2 text-light <?= $current_page == 'change_password.php' ? 'active' : '' ?>">
+            <a href="#"
+            class="nav-link d-flex align-items-center gap-2 text-light"
+            data-bs-toggle="modal"
+            data-bs-target="#changePasswordModal">
                 <i class="bi bi-key"></i>
                 <span class="sidebar-text">Change Password</span>
             </a>

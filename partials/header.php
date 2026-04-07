@@ -175,6 +175,7 @@
     </style>
 </head>
 <body>
+<?php include __DIR__ . '/../modal/change_password.php'; ?>
 
 <!-- Header -->
 <nav class="navbar navbar-light bg-light border-bottom header px-3">
