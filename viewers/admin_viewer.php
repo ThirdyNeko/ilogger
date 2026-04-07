@@ -49,12 +49,14 @@ include __DIR__ . '/../partials/sidebar.php';
                             </tr>
                         <?php else: ?>
                             <?php foreach ($iterations as $row): ?>
-                                <tr class="clickable-row <?= $row['error_count'] > 0 ? 'table-danger' : '' ?>"
+                                <tr class="clickable-row <?= (($row['error_count'] + $row['backend_errors']) > 0) ? 'table-danger' : '' ?>"
                                     data-iteration="<?= htmlspecialchars($row['iteration']) ?>">
                                     <td><strong><?= htmlspecialchars($row['iteration']) ?></strong></td>
                                     <td>
-                                        <?php if ($row['error_count'] > 0): ?>
-                                            <span class="badge bg-danger"><?= $row['error_count'] ?> error(s)</span>
+                                        <?php if (($row['error_count'] > 0) || ($row['backend_errors'] > 0)): ?>
+                                            <span class="badge bg-danger">
+                                                <?= ($row['error_count'] + $row['backend_errors']) ?> error(s)
+                                            </span>
                                         <?php else: ?>
                                             <span class="badge bg-success">No errors</span>
                                         <?php endif; ?>
