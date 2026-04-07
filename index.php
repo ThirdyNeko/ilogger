@@ -141,7 +141,12 @@ $(document).ready(function () {
             table.ajax.reload();
         });
 
-    // 🖱 Row click
+    const roleViewerMap = {
+        admin: 'viewers/admin_viewer.php',
+        qa: 'viewers/qa_viewer.php',
+        developer: 'viewers/dev_viewer.php'
+    };
+
     $('#logsTable tbody').on('click', 'tr', function () {
         const data = table.row(this).data();
         if (!data) return;
@@ -149,8 +154,10 @@ $(document).ready(function () {
         const program = data[0];
         const session = data[1];
 
+        const viewerPage = roleViewerMap[userRole];
+
         window.location.href =
-            `iteration_viewer.php?program=${encodeURIComponent(program)}&session=${encodeURIComponent(session)}`;
+            `${viewerPage}?program=${encodeURIComponent(program)}&session=${encodeURIComponent(session)}`;
     });
 
 });

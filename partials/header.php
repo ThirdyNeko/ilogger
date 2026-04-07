@@ -183,6 +183,9 @@
 </nav>
 
 <script>
+    const userRole = "<?= $_SESSION['role'] ?? '' ?>";
+</script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
     const body = document.body;
 
