@@ -144,7 +144,7 @@ $(document).ready(function () {
             table.ajax.reload();
         });
 
-    // Row click to iteration view
+    // 🖱 Row click to iteration view (role-based)
     $('#remarksTable tbody').on('click', 'tr', function() {
         const data = table.row(this).data();
         if (!data) return;
@@ -152,7 +152,16 @@ $(document).ready(function () {
         const session   = data[1];   // Session
         const iteration = data[2];   // Iteration
 
-        window.location.href = `iteration_viewer.php?session=${encodeURIComponent(session)}&iteration=${encodeURIComponent(iteration)}`;
+        const roleViewerMap = {
+            admin: 'viewers/admin_viewer.php',
+            qa: 'viewers/qa_viewer.php',
+            developer: 'viewers/dev_viewer.php'
+        };
+
+        const viewerPage = roleViewerMap[userRole];
+
+        window.location.href =
+            `${viewerPage}?session=${encodeURIComponent(session)}&iteration=${encodeURIComponent(iteration)}`;
     });
 });
 </script>
