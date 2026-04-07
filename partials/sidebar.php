@@ -31,6 +31,23 @@ $current_page = basename($_SERVER['SCRIPT_NAME']); // safer across folders
             </a>
         </li>
 
+        <!-- ✅ ADMIN ONLY: Users -->
+        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+        <li>
+            <a href="users.php" class="nav-link d-flex align-items-center gap-2 text-light <?= $current_page == 'users.php' ? 'active' : '' ?>">
+                <i class="bi bi-person-gear"></i>
+                <span>Users</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="users.php" class="nav-link d-flex align-items-center gap-2 text-light <?= $current_page == 'users.php' ? 'active' : '' ?>">
+                <i class="bi bi-person-gear"></i>
+                <span>Users</span>
+            </a>
+        </li>
+        <?php endif; ?>
+
         <!-- Change Password -->
         <li>
             <a href="#"
