@@ -1,3 +1,7 @@
+<?php
+$firstLogin = $_SESSION['first_login'] ?? 0; // 1 if first login, 0 otherwise
+echo ($_SESSION['first_login']); // should output 1
+?>
 <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -52,47 +56,81 @@
 <script src="<?= BASE_URL ?>sweetalert/dist/sweetalert2.all.min.js"></script>
 <script>
 const BASE_URL = '<?= BASE_URL ?>';
+let firstLogin = <?= (int)$firstLogin ?>;
 
-document.querySelectorAll('.toggle-password').forEach(span => {
-    span.addEventListener('click', () => {
-        const target = document.getElementById(span.dataset.target);
-        const icon = span.querySelector('i');
-        if (target.type === 'password') {
-            target.type = 'text';
-            icon.classList.replace('bi-eye', 'bi-eye-slash');
-        } else {
-            target.type = 'password';
-            icon.classList.replace('bi-eye-slash', 'bi-eye');
-        }
+document.addEventListener('DOMContentLoaded', () => {
+    const modalEl = document.getElementById('changePasswordModal');
+    const form = document.getElementById('changePasswordForm');
+
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(span => {
+        span.addEventListener('click', () => {
+            const target = document.getElementById(span.dataset.target);
+            const icon = span.querySelector('i');
+            if (target.type === 'password') {
+                target.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                target.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        });
     });
-});
 
-document.getElementById('changePasswordForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    const formData = new FormData(this);
-    const submitBtn = this.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
+    if (firstLogin === 1) {
+        // Initialize modal with static backdrop and no ESC
+        const modalInstance = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+        modalInstance.show();
 
-    fetch(`${BASE_URL}functions/change_password.php`, { method: 'POST', body: formData })
-    .then(res => res.json())
-    .then(data => {
-        Swal.fire({
-            icon: data.status === 'success' ? 'success' : 'error',
-            title: data.status === 'success' ? 'Password Changed!' : 'Oops...',
-            text: data.message,
-            confirmButtonText: 'OK'
+        // Function to prevent closing and show alert
+        function preventClose(e) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Action Required!',
+                text: 'You must change your password before continuing.',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        // Prevent closing the modal until password is changed
+        modalEl.addEventListener('hide.bs.modal', preventClose);
+        modalEl.querySelectorAll('.btn-close').forEach(btn => btn.addEventListener('click', preventClose));
+
+        // Handle password change
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+
+            fetch(`${BASE_URL}functions/change_password.php`, { method: 'POST', body: new FormData(form) })
+                .then(res => res.json())
+                .then(data => {
+                    Swal.fire({
+                        icon: data.status === 'success' ? 'success' : 'error',
+                        title: data.status === 'success' ? 'Password Changed!' : 'Oops...',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        if (data.status === 'success') {
+                            form.reset();
+                            firstLogin = 0;
+
+                            // Remove preventClose listeners
+                            modalEl.removeEventListener('hide.bs.modal', preventClose);
+                            modalEl.querySelectorAll('.btn-close').forEach(btn => btn.removeEventListener('click', preventClose));
+
+                            // Close modal
+                            modalInstance.hide();
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire({ icon: 'error', title: 'Error!', text: 'Something went wrong. Please try again.', confirmButtonText: 'OK' });
+                })
+                .finally(() => submitBtn.disabled = false);
         });
-        if(data.status === 'success') this.reset();
-    })
-    .catch(err => {
-        console.error(err);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: 'Something went wrong. Please try again.',
-            confirmButtonText: 'OK'
-        });
-    })
-    .finally(() => submitBtn.disabled = false);
+    }
 });
 </script>

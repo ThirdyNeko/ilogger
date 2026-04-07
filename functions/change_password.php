@@ -54,10 +54,11 @@ try {
     // Hash new password
     $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-    // Update password directly
+    // Update password and set first_login = 0
     $update = $pdo->prepare("
         UPDATE [BRANCH_LOGGER].[dbo].[users]
-        SET password_hash = :password
+        SET password_hash = :password,
+            first_login = 0
         WHERE id = :id
     ");
     $success = $update->execute([
